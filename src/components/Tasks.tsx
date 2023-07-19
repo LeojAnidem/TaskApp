@@ -1,17 +1,8 @@
+import { PencilIcon, SaveIcon, TrashIcon } from "@heroicons/react/outline";
 import {
-	ExclamationCircleIcon,
-	PencilIcon,
-	SaveIcon,
-	StatusOfflineIcon,
-	StatusOnlineIcon,
-	TrashIcon,
-} from "@heroicons/react/outline";
-import {
-	Badge,
 	Bold,
 	Button,
 	Card,
-	Color,
 	Select,
 	SelectItem,
 	Table,
@@ -27,24 +18,11 @@ import {
 
 import React, { FormEvent, JSXElementConstructor, useState } from "react";
 import { useAppSelector } from "../hooks/store";
-import { Task, TaskId, TaskStatus } from "../types/task";
-
-export interface TaskEditInputs {
-	id: TaskId;
-	isBeingEdited: boolean;
-	isSomeChange: boolean;
-	values: Task;
-}
-
-export interface BadgeStatus {
-	name: TaskStatus;
-	color: Color;
-	icon: React.ElementType;
-}
+import { TaskEditInputs, TaskId } from "../types/task";
+import { STATUS, setBadgeStatus } from "./utils/badge";
 
 export const Tasks = () => {
 	const tasks = useAppSelector((store) => store.tasks);
-
 	const DEFAULT_STATE_INPUT: TaskEditInputs[] = tasks.map((task) => ({
 		id: task.id,
 		isSomeChange: false,
@@ -55,37 +33,13 @@ export const Tasks = () => {
 			content: task.content,
 		},
 	}));
-
 	const [editInputs, setEditInputs] = useState(DEFAULT_STATE_INPUT);
 
-	const STATUS: BadgeStatus[] = [
-		{
-			name: "done",
-			color: "emerald",
-			icon: StatusOnlineIcon,
-		},
-		{
-			name: "ongoing",
-			color: "orange",
-			icon: ExclamationCircleIcon,
-		},
-		{
-			name: "pending",
-			color: "red",
-			icon: StatusOfflineIcon,
-		},
-	];
-
-	const setBadgeStatus = (status: TaskStatus) => {
-		const statusProperties = STATUS.find((item) => item.name === status);
-		return (
-			<Badge color={statusProperties?.color} icon={statusProperties?.icon}>
-				{statusProperties?.name}
-			</Badge>
-		);
-	};
-
-	const handlerOnChange = (id: TaskId, keyName: string, value: string | FormEvent<HTMLDivElement>) => {
+	const handlerOnChange = (
+		id: TaskId,
+		keyName: string,
+		value: string | FormEvent<HTMLDivElement>,
+	) => {
 		const updateEditInputs = editInputs.map((input) => {
 			if (input.id === id) {
 				input.isSomeChange = true;
@@ -158,9 +112,12 @@ export const Tasks = () => {
 							<TableCell>
 								{isBeingEdited ? (
 									<Select
-										icon={STATUS.find(e => e.name === values.status)?.icon as JSXElementConstructor<React.ElementType>}
+										icon={
+											STATUS.find((e) => e.name === values.status)
+												?.icon as JSXElementConstructor<React.ElementType>
+										}
 										value={values.status}
-										onChange={(e) => handlerOnChange(id, 'status', e) }
+										onChange={(e) => handlerOnChange(id, "status", e)}
 									>
 										{STATUS.map((status) => (
 											<SelectItem
