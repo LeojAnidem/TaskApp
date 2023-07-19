@@ -48,8 +48,8 @@ export const Tasks = () => {
 					[keyName]: value,
 				};
 
-				const setTrueCondition = Object.values(input.values).some((val) => val === '')
-				input.isSomeChange = !setTrueCondition ? true : false;
+				const someInputEmpty = Object.values(input.values).some((val) => val === '')
+				input.isSomeChange = !someInputEmpty ? true : false;
 			}
 			return input;
 		});
@@ -58,9 +58,15 @@ export const Tasks = () => {
 	};
 
 	const handlerEdit = (id: TaskId) => {
+		const oldStateValue = tasks.find((task) => task.id === id);
 		const updateEditInputs = editInputs.map((input) => {
 			if (input.id === id) {
 				input.isBeingEdited = !input.isBeingEdited;
+				(Object.keys(input.values) as Array<keyof typeof input.values>).map((key) => {
+					if (input.values[key] === '' && key !== 'status' && typeof oldStateValue !== 'undefined') {
+						input.values[key] = oldStateValue[key]
+					}
+				})
 			}
 			return input;
 		});
