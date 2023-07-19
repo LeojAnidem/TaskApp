@@ -129,6 +129,7 @@ export const Tasks = () => {
 								{isBeingEdited ? (
 									<TextInput
 										name="title"
+										onKeyUp={(e) => {if (e.keyCode === 13) handlerSubmitEdit(id)}}
 										onChange={(e) =>
 											handlerOnChange(id, e.target.name, e.target.value)
 										}
