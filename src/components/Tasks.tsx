@@ -95,6 +95,7 @@ export const Tasks = () => {
 							<TableCell>
 								{isBeingEdited ? (
 									<TextInput
+										maxLength={23}
 										name="title"
 										onKeyUp={(e) => {
 											if (e.keyCode === 13) handlerSubmitEdit(id);
@@ -109,27 +110,32 @@ export const Tasks = () => {
 									<Bold>{values.title}</Bold>
 								)}
 							</TableCell>
-							<TableCell>
+							<TableCell className={`${isBeingEdited && 'w-48'}`}>
 								{isBeingEdited ? (
-									<Select
-										icon={
-											STATUS.find((e) => e.name === values.status)
-												?.icon as JSXElementConstructor<React.ElementType>
-										}
-										value={values.status}
-										onChange={(e) => handlerOnChange(id, "status", e)}
-									>
-										{STATUS.map((status) => (
-											<SelectItem
-												key={status.name}
-												color={status.color}
-												icon={status.icon}
-												value={status.name}
-											>
-												{status.name}
-											</SelectItem>
-										))}
-									</Select>
+										<div className="absolute">	
+											<div className="relative">
+												<Select
+													className="absolute w-40 -top-5 -left-1"
+													icon={
+														STATUS.find((e) => e.name === values.status)
+															?.icon as JSXElementConstructor<React.ElementType>
+													}
+													value={values.status}
+													onChange={(e) => handlerOnChange(id, "status", e)}
+												>
+													{STATUS.map((status) => (
+														<SelectItem
+															key={status.name}
+															color={status.color}
+															icon={status.icon}
+															value={status.name}
+														>
+															{status.name}
+														</SelectItem>
+													))}
+												</Select>
+											</div>
+										</div>
 								) : (
 									<>{setBadgeStatus(values.status)}</>
 								)}
