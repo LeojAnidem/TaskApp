@@ -4,13 +4,16 @@ import {
 	SaveIcon,
 	StatusOfflineIcon,
 	StatusOnlineIcon,
-	TrashIcon
+	TrashIcon,
 } from "@heroicons/react/outline";
 import {
 	Badge,
 	Bold,
 	Button,
 	Card,
+	Color,
+	Select,
+	SelectItem,
 	Table,
 	TableBody,
 	TableCell,
@@ -22,15 +25,21 @@ import {
 	Title,
 } from "@tremor/react";
 
+import React, { FormEvent, JSXElementConstructor, useState } from "react";
 import { useAppSelector } from "../hooks/store";
 import { Task, TaskId, TaskStatus } from "../types/task";
-import { useState } from "react";
 
 export interface TaskEditInputs {
 	id: TaskId;
 	isBeingEdited: boolean;
-	isSomeChange: boolean
+	isSomeChange: boolean;
 	values: Task;
+}
+
+export interface BadgeStatus {
+	name: TaskStatus;
+	color: Color;
+	icon: React.ElementType;
 }
 
 export const Tasks = () => {
@@ -49,33 +58,37 @@ export const Tasks = () => {
 
 	const [editInputs, setEditInputs] = useState(DEFAULT_STATE_INPUT);
 
+	const STATUS: BadgeStatus[] = [
+		{
+			name: "done",
+			color: "emerald",
+			icon: StatusOnlineIcon,
+		},
+		{
+			name: "ongoing",
+			color: "orange",
+			icon: ExclamationCircleIcon,
+		},
+		{
+			name: "pending",
+			color: "red",
+			icon: StatusOfflineIcon,
+		},
+	];
+
 	const setBadgeStatus = (status: TaskStatus) => {
-		switch (status) {
-			case "done":
-				return (
-					<Badge color="emerald" icon={StatusOnlineIcon}>
-						{status}
-					</Badge>
-				);
-			case "ongoing":
-				return (
-					<Badge color="orange" icon={ExclamationCircleIcon}>
-						{status}
-					</Badge>
-				);
-			case "pending":
-				return (
-					<Badge color="red" icon={StatusOfflineIcon}>
-						{status}
-					</Badge>
-				);
-		}
+		const statusProperties = STATUS.find((item) => item.name === status);
+		return (
+			<Badge color={statusProperties?.color} icon={statusProperties?.icon}>
+				{statusProperties?.name}
+			</Badge>
+		);
 	};
 
-	const handlerOnChange = (id: TaskId, keyName: string, value: string) => {
+	const handlerOnChange = (id: TaskId, keyName: string, value: string | FormEvent<HTMLDivElement>) => {
 		const updateEditInputs = editInputs.map((input) => {
 			if (input.id === id) {
-				input.isSomeChange = true
+				input.isSomeChange = true;
 				input.values = {
 					...input.values,
 					[keyName]: value,
@@ -108,7 +121,7 @@ export const Tasks = () => {
 		});
 
 		setEditInputs(updateEditInputs);
-	}
+	};
 
 	return (
 		<Card>
@@ -129,7 +142,9 @@ export const Tasks = () => {
 								{isBeingEdited ? (
 									<TextInput
 										name="title"
-										onKeyUp={(e) => {if (e.keyCode === 13) handlerSubmitEdit(id)}}
+										onKeyUp={(e) => {
+											if (e.keyCode === 13) handlerSubmitEdit(id);
+										}}
 										onChange={(e) =>
 											handlerOnChange(id, e.target.name, e.target.value)
 										}
@@ -140,7 +155,28 @@ export const Tasks = () => {
 									<Bold>{values.title}</Bold>
 								)}
 							</TableCell>
-							<TableCell>{setBadgeStatus(values.status)}</TableCell>
+							<TableCell>
+								{isBeingEdited ? (
+									<Select
+										icon={STATUS.find(e => e.name === values.status)?.icon as JSXElementConstructor<React.ElementType>}
+										value={values.status}
+										onChange={(e) => handlerOnChange(id, 'status', e) }
+									>
+										{STATUS.map((status) => (
+											<SelectItem
+												key={status.name}
+												color={status.color}
+												icon={status.icon}
+												value={status.name}
+											>
+												{status.name}
+											</SelectItem>
+										))}
+									</Select>
+								) : (
+									<>{setBadgeStatus(values.status)}</>
+								)}
+							</TableCell>
 							<TableCell>
 								<Text>{values.content}</Text>
 							</TableCell>
@@ -160,7 +196,7 @@ export const Tasks = () => {
 									icon={TrashIcon}
 									disabled={isBeingEdited}
 								/>
-								{isBeingEdited && 
+								{isBeingEdited && (
 									<Button
 										loading={!isSomeChange}
 										icon={SaveIcon}
@@ -168,7 +204,7 @@ export const Tasks = () => {
 									>
 										Guardar
 									</Button>
-								}
+								)}
 							</TableCell>
 						</TableRow>
 					))}
