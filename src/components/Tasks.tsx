@@ -3,6 +3,7 @@ import {
 	Bold,
 	Button,
 	Card,
+	Flex,
 	Select,
 	SelectItem,
 	Table,
@@ -42,11 +43,13 @@ export const Tasks = () => {
 	) => {
 		const updateEditInputs = editInputs.map((input) => {
 			if (input.id === id) {
-				input.isSomeChange = true;
 				input.values = {
 					...input.values,
 					[keyName]: value,
 				};
+
+				const setTrueCondition = Object.values(input.values).some((val) => val === '')
+				input.isSomeChange = !setTrueCondition ? true : false;
 			}
 			return input;
 		});
@@ -63,6 +66,11 @@ export const Tasks = () => {
 		});
 
 		setEditInputs(updateEditInputs);
+	};
+
+	const handlerEnter = (id: TaskId, keyCode: number, value: string) => {
+		if (keyCode !== 13 || value === "") return;
+		handlerSubmitEdit(id);
 	};
 
 	const handlerSubmitEdit = (id: TaskId) => {
@@ -95,79 +103,106 @@ export const Tasks = () => {
 							<TableCell>
 								{isBeingEdited ? (
 									<TextInput
+										className="!bg-dark-tremor-border"
 										maxLength={23}
+										icon={PencilIcon}
 										name="title"
-										onKeyUp={(e) => {
-											if (e.keyCode === 13) handlerSubmitEdit(id);
-										}}
-										onChange={(e) =>
-											handlerOnChange(id, e.target.name, e.target.value)
+										onKeyUp={({ keyCode, target }) =>
+											handlerEnter(
+												id,
+												keyCode,
+												(target as HTMLButtonElement).value,
+											)
 										}
-										placeholder={values.title}
+										onChange={({ target }) =>
+											handlerOnChange(id, target.name, target.value)
+										}
 										value={values.title}
 									/>
 								) : (
 									<Bold>{values.title}</Bold>
 								)}
 							</TableCell>
-							<TableCell className={`${isBeingEdited && 'w-48'}`}>
+							<TableCell className={`${isBeingEdited && "w-48"}`}>
 								{isBeingEdited ? (
-										<div className="absolute">	
-											<div className="relative">
-												<Select
-													className="absolute w-40 -top-5 -left-1"
-													icon={
-														STATUS.find((e) => e.name === values.status)
-															?.icon as JSXElementConstructor<React.ElementType>
-													}
-													value={values.status}
-													onChange={(e) => handlerOnChange(id, "status", e)}
-												>
-													{STATUS.map((status) => (
-														<SelectItem
-															key={status.name}
-															color={status.color}
-															icon={status.icon}
-															value={status.name}
-														>
-															{status.name}
-														</SelectItem>
-													))}
-												</Select>
-											</div>
+									<div className="absolute">
+										<div className="relative">
+											<Select
+												className="absolute w-40 -top-5 -left-1"
+												icon={
+													STATUS.find((e) => e.name === values.status)
+														?.icon as JSXElementConstructor<React.ElementType>
+												}
+												value={values.status}
+												onChange={(e) => handlerOnChange(id, "status", e)}
+											>
+												{STATUS.map((status) => (
+													<SelectItem
+														key={status.name}
+														color={status.color}
+														icon={status.icon}
+														value={status.name}
+													>
+														{status.name}
+													</SelectItem>
+												))}
+											</Select>
 										</div>
+									</div>
 								) : (
 									<>{setBadgeStatus(values.status)}</>
 								)}
 							</TableCell>
 							<TableCell>
-								<Text>{values.content}</Text>
-							</TableCell>
-							<TableCell className="flex gap-2">
-								<Button
-									tooltip="edit"
-									size="md"
-									variant="light"
-									icon={PencilIcon}
-									onClick={() => handlerEdit(id)}
-									disabled={isSomeChange}
-								/>
-								<Button
-									tooltip="remove"
-									size="md"
-									variant="light"
-									icon={TrashIcon}
-									disabled={isBeingEdited}
-								/>
-								{isBeingEdited && (
-									<Button
-										loading={!isSomeChange}
-										icon={SaveIcon}
-										onClick={() => handlerSubmitEdit(id)}
-									>
-										Guardar
-									</Button>
+								{isBeingEdited ? (
+									<TextInput
+										className="!bg-dark-tremor-border"
+										maxLength={30}
+										icon={PencilIcon}
+										name="content"
+										onKeyUp={({ keyCode, target }) =>
+											handlerEnter(
+												id,
+												keyCode,
+												(target as HTMLButtonElement).value,
+											)
+										}
+										onChange={({ target }) =>
+											handlerOnChange(id, target.name, target.value)
+										}
+										value={values.content}
+									/>
+								) : (
+									<Text>{values.content}</Text>
 								)}
+							</TableCell>
+							<TableCell>
+								<Flex justifyContent="start">
+									<Button
+										tooltip="edit"
+										size="md"
+										variant="light"
+										icon={PencilIcon}
+										onClick={() => handlerEdit(id)}
+										disabled={isSomeChange}
+									/>
+									<Button
+										tooltip="remove"
+										size="md"
+										variant="light"
+										icon={TrashIcon}
+										disabled={isBeingEdited}
+									/>
+									{isBeingEdited && (
+										<Button
+											loading={!isSomeChange}
+											icon={SaveIcon}
+											onClick={() => handlerSubmitEdit(id)}
+										>
+											Guardar
+										</Button>
+									)}
+								</Flex>
 							</TableCell>
 						</TableRow>
 					))}
