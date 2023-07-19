@@ -1,9 +1,10 @@
 import {
 	ExclamationCircleIcon,
 	PencilIcon,
+	SaveIcon,
 	StatusOfflineIcon,
 	StatusOnlineIcon,
-	TrashIcon,
+	TrashIcon
 } from "@heroicons/react/outline";
 import {
 	Badge,
@@ -21,13 +22,14 @@ import {
 	Title,
 } from "@tremor/react";
 
-import { useState } from "react";
 import { useAppSelector } from "../hooks/store";
 import { Task, TaskId, TaskStatus } from "../types/task";
+import { useState } from "react";
 
 export interface TaskEditInputs {
 	id: TaskId;
 	isBeingEdited: boolean;
+	isSomeChange: boolean
 	values: Task;
 }
 
@@ -36,6 +38,7 @@ export const Tasks = () => {
 
 	const DEFAULT_STATE_INPUT: TaskEditInputs[] = tasks.map((task) => ({
 		id: task.id,
+		isSomeChange: false,
 		isBeingEdited: false,
 		values: {
 			title: task.title,
@@ -72,6 +75,7 @@ export const Tasks = () => {
 	const handlerOnChange = (id: TaskId, keyName: string, value: string) => {
 		const updateEditInputs = editInputs.map((input) => {
 			if (input.id === id) {
+				input.isSomeChange = true
 				input.values = {
 					...input.values,
 					[keyName]: value,
@@ -83,14 +87,28 @@ export const Tasks = () => {
 		setEditInputs(updateEditInputs);
 	};
 
-	const handlerEditBtn = (id: TaskId) => {
+	const handlerEdit = (id: TaskId) => {
 		const updateEditInputs = editInputs.map((input) => {
-			if (input.id === id) input.isBeingEdited = !input.isBeingEdited;
+			if (input.id === id) {
+				input.isBeingEdited = !input.isBeingEdited;
+			}
 			return input;
 		});
 
 		setEditInputs(updateEditInputs);
 	};
+
+	const handlerSubmitEdit = (id: TaskId) => {
+		const updateEditInputs = editInputs.map((input) => {
+			if (input.id === id) {
+				input.isBeingEdited = false;
+				input.isSomeChange = false;
+			}
+			return input;
+		});
+
+		setEditInputs(updateEditInputs);
+	}
 
 	return (
 		<Card>
@@ -105,7 +123,7 @@ export const Tasks = () => {
 					</TableRow>
 				</TableHead>
 				<TableBody>
-					{editInputs.map(({ id, isBeingEdited, values }) => (
+					{editInputs.map(({ id, isSomeChange, isBeingEdited, values }) => (
 						<TableRow key={id}>
 							<TableCell>
 								{isBeingEdited ? (
@@ -131,14 +149,25 @@ export const Tasks = () => {
 									size="md"
 									variant="light"
 									icon={PencilIcon}
-									onClick={() => handlerEditBtn(id)}
+									onClick={() => handlerEdit(id)}
+									disabled={isSomeChange}
 								/>
 								<Button
 									tooltip="remove"
 									size="md"
 									variant="light"
 									icon={TrashIcon}
+									disabled={isBeingEdited}
 								/>
+								{isBeingEdited && 
+									<Button
+										loading={!isSomeChange}
+										icon={SaveIcon}
+										onClick={() => handlerSubmitEdit(id)}
+									>
+										Guardar
+									</Button>
+								}
 							</TableCell>
 						</TableRow>
 					))}
