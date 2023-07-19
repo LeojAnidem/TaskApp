@@ -17,29 +17,30 @@ import {
 	Title,
 } from "@tremor/react";
 
-import React, { FormEvent, JSXElementConstructor, useState } from "react";
+import React, {
+	FormEvent,
+	JSXElementConstructor,
+	useEffect,
+	useState,
+} from "react";
 import { useAppSelector } from "../hooks/store";
-import { TaskEditInputs, TaskId } from "../types/task";
+import { useTasksActions } from "../hooks/useTasksActions";
+import { TaskId } from "../types/task";
 import { STATUS, setBadgeStatus } from "./utils/badge";
-
-// Verifica que ningun input este vacio
-export const someObjectKeysEmpty = (obj: object) => {
-	return Object.values(obj).some((val) => val === "");
-};
+import { parseTasksToInputs, someObjectKeysEmpty } from "./utils/utilities";
 
 export const Tasks = () => {
 	const tasks = useAppSelector((store) => store.tasks);
-	const DEFAULT_STATE_INPUT: TaskEditInputs[] = tasks.map((task) => ({
-		id: task.id,
-		isSomeChange: false,
-		isBeingEdited: false,
-		values: {
-			title: task.title,
-			status: task.status,
-			content: task.content,
-		},
-	}));
+	const { edit, deleteById } = useTasksActions();
+
+	const DEFAULT_STATE_INPUT = parseTasksToInputs(tasks);
 	const [editInputs, setEditInputs] = useState(DEFAULT_STATE_INPUT);
+
+	// Cada que la store se actualice se volvera a establecer el valor
+	// de editInputs (Tasks en pantalla)
+	useEffect(() => {
+		setEditInputs(parseTasksToInputs(tasks));
+	}, [tasks]);
 
 	const handlerOnChange = (
 		id: TaskId,
@@ -87,13 +88,19 @@ export const Tasks = () => {
 			!someObjectKeysEmpty(idInputVals);
 
 		if (!isValidSubmit) return;
-		handlerSubmitEdit(id);
+		handlerSubmit(id);
 	};
 
-	const handlerSubmitEdit = (id: TaskId) => {
+	const handlerSubmit = (id: TaskId) => {
 		const updateEditInputs = editInputs.map((input) => {
 			if (input.id === id) {
 				// ... space for dispatch edit task by id in reducer
+				const newTaskId = {
+					id: input.id,
+					...input.values,
+				};
+				edit(newTaskId);
+
 				input.isBeingEdited = false;
 				input.isSomeChange = false;
 			}
@@ -102,6 +109,8 @@ export const Tasks = () => {
 
 		setEditInputs(updateEditInputs);
 	};
+
+	const handlerRemove = (id: TaskId) => deleteById(id);
 
 	return (
 		<Card>
@@ -197,13 +206,14 @@ export const Tasks = () => {
 										size="md"
 										variant="light"
 										icon={TrashIcon}
+										onClick={() => handlerRemove(id)}
 										disabled={isBeingEdited}
 									/>
 									{isBeingEdited && (
 										<Button
 											loading={!isSomeChange}
 											icon={SaveIcon}
-											onClick={() => handlerSubmitEdit(id)}
+											onClick={() => handlerSubmit(id)}
 										>
 											Guardar
 										</Button>

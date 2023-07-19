@@ -1,5 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { TaskWithId } from "../../../types/task";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { Task, TaskId, TaskWithId } from "../../../types/task";
 
 const DEFAULT_STATE: TaskWithId[] = [
 	{
@@ -26,11 +26,29 @@ export const taskSlice = createSlice({
 	name: "tasks",
 	initialState: DEFAULT_STATE,
 	reducers: {
-		addTask: (state, action) => {},
-		deleteTaskById: (state, action) => {},
-		editTask: (state, action) => {},
+		addTask: (state, action: PayloadAction<Task>) => {
+			const { payload } = action
+			const newTask: TaskWithId = {
+				id: crypto.randomUUID(),
+				...payload
+			}
+			state .push(newTask)
+		},
+		deleteTaskById: (state, action: PayloadAction<TaskId>) => {
+			const id = action.payload
+			const newState = state.filter(task => task.id !== id)
+			console.log(id, newState)
+			return [...newState]
+		},
+		editTask: (state, action: PayloadAction<TaskWithId>) => {
+			const { payload } = action;
+			return state.map((task) => {
+				if (task.id === payload.id) return { ...payload };
+				return task
+			});
+		},
 	},
 });
 
 export default taskSlice.reducer;
-export const { addTask } = taskSlice.actions;
+export const { addTask, deleteTaskById, editTask } = taskSlice.actions;
