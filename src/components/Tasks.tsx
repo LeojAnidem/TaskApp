@@ -22,6 +22,11 @@ import { useAppSelector } from "../hooks/store";
 import { TaskEditInputs, TaskId } from "../types/task";
 import { STATUS, setBadgeStatus } from "./utils/badge";
 
+// Verifica que ningun input este vacio
+export const someObjectKeysEmpty = (obj: object) => {
+	return Object.values(obj).some((val) => val === "");
+};
+
 export const Tasks = () => {
 	const tasks = useAppSelector((store) => store.tasks);
 	const DEFAULT_STATE_INPUT: TaskEditInputs[] = tasks.map((task) => ({
@@ -47,9 +52,7 @@ export const Tasks = () => {
 					...input.values,
 					[keyName]: value,
 				};
-
-				const someInputEmpty = Object.values(input.values).some((val) => val === '')
-				input.isSomeChange = !someInputEmpty ? true : false;
+				input.isSomeChange = !someObjectKeysEmpty(input.values) ? true : false;
 			}
 			return input;
 		});
@@ -62,11 +65,12 @@ export const Tasks = () => {
 		const updateEditInputs = editInputs.map((input) => {
 			if (input.id === id) {
 				input.isBeingEdited = !input.isBeingEdited;
-				(Object.keys(input.values) as Array<keyof typeof input.values>).map((key) => {
-					if (input.values[key] === '' && key !== 'status' && typeof oldStateValue !== 'undefined') {
-						input.values[key] = oldStateValue[key]
-					}
-				})
+
+				const needOldValues =
+					someObjectKeysEmpty(input.values) &&
+					typeof oldStateValue !== "undefined";
+
+				if (needOldValues) input.values = oldStateValue;
 			}
 			return input;
 		});
@@ -74,14 +78,22 @@ export const Tasks = () => {
 		setEditInputs(updateEditInputs);
 	};
 
-	const handlerEnter = (id: TaskId, keyCode: number, value: string) => {
-		if (keyCode !== 13 || value === "") return;
+	const handlerEnter = (id: TaskId, keyCode: number) => {
+		const idInputVals = editInputs.find((input) => input.id === id)?.values;
+
+		const isValidSubmit =
+			keyCode === 13 &&
+			typeof idInputVals !== "undefined" &&
+			!someObjectKeysEmpty(idInputVals);
+
+		if (!isValidSubmit) return;
 		handlerSubmitEdit(id);
 	};
 
 	const handlerSubmitEdit = (id: TaskId) => {
 		const updateEditInputs = editInputs.map((input) => {
 			if (input.id === id) {
+				// ... space for dispatch edit task by id in reducer
 				input.isBeingEdited = false;
 				input.isSomeChange = false;
 			}
@@ -113,13 +125,7 @@ export const Tasks = () => {
 										maxLength={23}
 										icon={PencilIcon}
 										name="title"
-										onKeyUp={({ keyCode, target }) =>
-											handlerEnter(
-												id,
-												keyCode,
-												(target as HTMLButtonElement).value,
-											)
-										}
+										onKeyUp={({ keyCode }) => handlerEnter(id, keyCode)}
 										onChange={({ target }) =>
 											handlerOnChange(id, target.name, target.value)
 										}
@@ -163,16 +169,10 @@ export const Tasks = () => {
 								{isBeingEdited ? (
 									<TextInput
 										className="!bg-dark-tremor-border"
-										maxLength={30}
+										maxLength={42}
 										icon={PencilIcon}
 										name="content"
-										onKeyUp={({ keyCode, target }) =>
-											handlerEnter(
-												id,
-												keyCode,
-												(target as HTMLButtonElement).value,
-											)
-										}
+										onKeyUp={({ keyCode }) => handlerEnter(id, keyCode)}
 										onChange={({ target }) =>
 											handlerOnChange(id, target.name, target.value)
 										}
