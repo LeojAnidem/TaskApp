@@ -1,0 +1,6 @@
+.app {
+  @apply
+  w-full h-screen overflow-hidden
+  grid items-center justify-center
+  bg-dark-tremor-ring
+}
