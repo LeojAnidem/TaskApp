@@ -1,7 +1,5 @@
 # Aplicación de Creación de Notas Web
 
-![TaskApp](https://i.imgur.com/YTKfl0p.png)
-
 La Aplicación de Creación de Notas Web te permite crear, ver, editar y eliminar notas de manera sencilla y eficiente. Organiza tus pensamientos y recordatorios de manera ordenada y accede a ellos desde cualquier dispositivo con conexión a internet.
 
 ## Características
