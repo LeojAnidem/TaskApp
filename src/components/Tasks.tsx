@@ -1,5 +1,6 @@
 import { PencilIcon, SaveIcon, TrashIcon } from "@heroicons/react/outline";
 import {
+	Badge,
 	Bold,
 	Button,
 	Card,
@@ -41,7 +42,7 @@ export const Tasks = () => {
 	// Cada que la store se actualice se volvera a establecer el valor
 	// de editInputs (Tasks en pantalla)
 	useEffect(() => {
-		if (!editInputs.some(input => input.isBeingEdited)) {
+		if (!editInputs.some((input) => input.isBeingEdited)) {
 			setEditInputs(parseTasksToInputs(tasks));
 		}
 	}, [tasks, editInputs]);
@@ -57,7 +58,7 @@ export const Tasks = () => {
 					...input.values,
 					[keyName]: value,
 				};
-				input.isSomeChange = !someObjectKeysEmpty(input.values) ? true : false;
+				input.isSomeChange = !someObjectKeysEmpty(input.values);
 			}
 			return input;
 		});
@@ -118,7 +119,16 @@ export const Tasks = () => {
 
 	return (
 		<Card>
-			<Metric>Tasks</Metric>
+			<Metric>
+				<Flex justifyContent="start" alignItems="end" className="gap-2">
+					Tasks
+					<Badge size="md">{editInputs.length}</Badge>
+					{tasks.length > editInputs.length &&
+						editInputs.some((input) => input.isBeingEdited) && (
+							<Badge color="green">New task Added!</Badge>
+						)}
+				</Flex>
+			</Metric>
 			<Divider />
 			<Table className="overflow-y-auto overflow-x-hidden !max-h-[350px] scroll">
 				<TableHead>
