@@ -41,8 +41,10 @@ export const Tasks = () => {
 	// Cada que la store se actualice se volvera a establecer el valor
 	// de editInputs (Tasks en pantalla)
 	useEffect(() => {
-		setEditInputs(parseTasksToInputs(tasks));
-	}, [tasks]);
+		if (!editInputs.some(input => input.isBeingEdited)) {
+			setEditInputs(parseTasksToInputs(tasks));
+		}
+	}, [tasks, editInputs]);
 
 	const handlerOnChange = (
 		id: TaskId,
