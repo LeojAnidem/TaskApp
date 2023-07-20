@@ -12,7 +12,7 @@ La Aplicación de Creación de Notas Web te permite crear, ver, editar y elimina
 
 ## Uso
 
-Visita la [Aplicación de Creación de Notas](link-to-github-pages) para comenzar a organizar tus ideas.
+Visita la [Aplicación de Creación de Notas](https://leojanidem.github.io/TaskApp/) para comenzar a organizar tus ideas.
 
 ## Contribuciones
 
