@@ -157,7 +157,7 @@ export const Tasks = () => {
 									<Bold>{values.title}</Bold>
 								)}
 							</TableCell>
-							<TableCell className={`${isBeingEdited && "w-48"} select_bx`}>
+							<TableCell className="select_bx">
 								{isBeingEdited ? (
 									<Select
 										className="select"
@@ -216,7 +216,7 @@ export const Tasks = () => {
 										variant="light"
 										icon={TrashIcon}
 										onClick={() => handlerRemove(id)}
-										disabled={isBeingEdited}
+										disabled={editInputs.some((input) => input.isBeingEdited)}
 									/>
 									{isBeingEdited && (
 										<Button
