@@ -4,3 +4,32 @@
   grid items-center justify-center
   bg-dark-tremor-ring
 }
+
+.scroll::-webkit-scrollbar{
+  width: 10px;
+}
+
+.scroll::-webkit-scrollbar-track{
+  @apply mt-16 bg-dark-tremor-background-subtle
+  rounded-xl;
+}
+
+.scroll::-webkit-scrollbar-thumb {
+  @apply bg-dark-tremor-content-subtle rounded-xl
+  border-dark-tremor-background-subtle;
+}
+
+
+.select > :first-child,
+.select > ul{
+  @apply !bg-dark-tremor-background-subtle
+}
+
+.table_elements > :last-child > .select_bx > .select > ul,
+.table_elements > :nth-last-child(2) > .select_bx > .select > ul {
+  @apply !-top-32
+}
+
+.header_table > * {
+  @apply !bg-dark-tremor-background
+}

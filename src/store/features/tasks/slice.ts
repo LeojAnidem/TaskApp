@@ -20,6 +20,18 @@ const DEFAULT_STATE: TaskWithId[] = [
 		content: "El contenido de esta tarea esta en curso",
 		status: "ongoing",
 	},
+	{
+		id: "4",
+		title: "Tarea #4",
+		content: "El contenido de esta tarea esta terminado",
+		status: "done",
+	},
+	{
+		id: "5",
+		title: "Tarea #5",
+		content: "El contenido de esta tarea esta pendiente",
+		status: "pending",
+	}
 ];
 
 export const taskSlice = createSlice({

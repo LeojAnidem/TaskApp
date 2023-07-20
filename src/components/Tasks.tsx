@@ -3,7 +3,9 @@ import {
 	Bold,
 	Button,
 	Card,
+	Divider,
 	Flex,
+	Metric,
 	Select,
 	SelectItem,
 	Table,
@@ -114,17 +116,26 @@ export const Tasks = () => {
 
 	return (
 		<Card>
-			<Title>Tasks</Title>
-			<Table>
+			<Metric>Tasks</Metric>
+			<Divider />
+			<Table className="overflow-y-auto overflow-x-hidden !max-h-[350px] scroll">
 				<TableHead>
-					<TableRow>
-						<TableHeaderCell>Title</TableHeaderCell>
-						<TableHeaderCell>Status</TableHeaderCell>
-						<TableHeaderCell>Content</TableHeaderCell>
-						<TableHeaderCell>Actions</TableHeaderCell>
+					<TableRow className="header_table">
+						<TableHeaderCell>
+							<Title>Title</Title>
+						</TableHeaderCell>
+						<TableHeaderCell>
+							<Title>Status</Title>
+						</TableHeaderCell>
+						<TableHeaderCell>
+							<Title>Content</Title>
+						</TableHeaderCell>
+						<TableHeaderCell>
+							<Title>Actions</Title>
+						</TableHeaderCell>
 					</TableRow>
 				</TableHead>
-				<TableBody>
+				<TableBody className="table_elements">
 					{editInputs.map(({ id, isSomeChange, isBeingEdited, values }) => (
 						<TableRow key={id}>
 							<TableCell>
@@ -144,32 +155,28 @@ export const Tasks = () => {
 									<Bold>{values.title}</Bold>
 								)}
 							</TableCell>
-							<TableCell className={`${isBeingEdited && "w-48"}`}>
+							<TableCell className={`${isBeingEdited && "w-48"} select_bx`}>
 								{isBeingEdited ? (
-									<div className="absolute">
-										<div className="relative">
-											<Select
-												className="absolute w-40 -top-5 -left-1"
-												icon={
-													STATUS.find((e) => e.name === values.status)
-														?.icon as JSXElementConstructor<React.ElementType>
-												}
-												value={values.status}
-												onChange={(e) => handlerOnChange(id, "status", e)}
+									<Select
+										className="select"
+										icon={
+											STATUS.find((e) => e.name === values.status)
+												?.icon as JSXElementConstructor<React.ElementType>
+										}
+										value={values.status}
+										onChange={(e) => handlerOnChange(id, "status", e)}
+									>
+										{STATUS.map((status) => (
+											<SelectItem
+												key={status.name}
+												color={status.color}
+												icon={status.icon}
+												value={status.name}
 											>
-												{STATUS.map((status) => (
-													<SelectItem
-														key={status.name}
-														color={status.color}
-														icon={status.icon}
-														value={status.name}
-													>
-														{status.name}
-													</SelectItem>
-												))}
-											</Select>
-										</div>
-									</div>
+												{status.name}
+											</SelectItem>
+										))}
+									</Select>
 								) : (
 									<>{setBadgeStatus(values.status)}</>
 								)}
