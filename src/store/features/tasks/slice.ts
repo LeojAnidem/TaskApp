@@ -31,31 +31,36 @@ const DEFAULT_STATE: TaskWithId[] = [
 		title: "Tarea #5",
 		content: "El contenido de esta tarea esta pendiente",
 		status: "pending",
-	}
+	},
 ];
+
+const initialState: TaskWithId[] = (() => {
+	const tasksLocalStorge = localStorage.getItem("__LOCAL__TASK__");
+	return tasksLocalStorge ? JSON.parse(tasksLocalStorge).tasks : DEFAULT_STATE;
+})();
 
 export const taskSlice = createSlice({
 	name: "tasks",
-	initialState: DEFAULT_STATE,
+	initialState,
 	reducers: {
 		addTask: (state, action: PayloadAction<Task>) => {
-			const { payload } = action
+			const { payload } = action;
 			const newTask: TaskWithId = {
 				id: crypto.randomUUID(),
-				...payload
-			}
-			state .push(newTask)
+				...payload,
+			};
+			state.push(newTask);
 		},
 		deleteTaskById: (state, action: PayloadAction<TaskId>) => {
-			const id = action.payload
-			const newState = state.filter(task => task.id !== id)
-			return [...newState]
+			const id = action.payload;
+			const newState = state.filter((task) => task.id !== id);
+			return [...newState];
 		},
 		editTask: (state, action: PayloadAction<TaskWithId>) => {
 			const { payload } = action;
 			return state.map((task) => {
 				if (task.id === payload.id) return { ...payload };
-				return task
+				return task;
 			});
 		},
 	},

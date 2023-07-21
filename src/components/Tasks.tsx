@@ -82,7 +82,7 @@ export const Tasks = () => {
 		});
 
 		setEditInputs(updateEditInputs);
-	};
+	};  
 
 	const handlerEnter = (id: TaskId, keyCode: number) => {
 		const idInputVals = editInputs.find((input) => input.id === id)?.values;
